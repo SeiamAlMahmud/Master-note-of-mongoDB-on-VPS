@@ -2,7 +2,7 @@
 
 ## **Ubuntu VPS-এ MongoDB Setup, User Management, এবং Firewall Configuration (Step-by-Step)**
 ---
-এই গাইডে আমি বিস্তারিতভাবে Ubuntu VPS-এ **MongoDB ইনস্টল, ইউজার তৈরি, ডাটাবেস তৈরি, ইউজার ও ডাটাবেস ম্যানেজমেন্ট, Firewall কনফিগারেশন, এবং IP Access Control** সম্পর্কে বলব।
+এই গাইডে আমি বিস্তারিতভাবে Ubuntu VPS-এ **MongoDB ইনস্টল, ইউজার তৈরি, ডাটাবেস তৈরি, ইউজার ও ডাটাবেস ম্যানেজমেন্ট, Firewall কনফিগারেশন,  IP Access Control এবং Automatic Backup** সম্পর্কে বলব।
 
 ---
 
@@ -104,7 +104,7 @@ db.updateUser("myUser", { pwd: "newSecurePassword" });
 
 ---
 
-## **Step 8: User মুছে ফেলা (Delete)**
+## **Step 6: User মুছে ফেলা (Delete)**
 ```javascript
 use admin
 db.dropUser("myUser")
@@ -112,7 +112,7 @@ db.dropUser("myUser")
 
 ---
 
-## **Step 9: Database Rename করা (MongoDB-তে সরাসরি Rename অপশন নেই)**
+## **Step 7: Database Rename করা (MongoDB-তে সরাসরি Rename অপশন নেই)**
 MongoDB-তে ডাটাবেস Rename করার কোনো সরাসরি কমান্ড নেই। তবে, **নতুন ডাটাবেস তৈরি করে পুরানো ডাটাবেস থেকে ডাটা কপি করে, পরে পুরানোটি ডিলিট করতে হয়।**
 
 **Database Rename করার পদ্ধতি:**
@@ -123,7 +123,7 @@ mongorestore --db newDatabase /backup/oldDatabase/
 
 ---
 
-## **Step 10: Database Delete করা**
+## **Step 8: Database Delete করা**
 MongoDB-তে কোনো ডাটাবেস **ডিলিট করার আগে সেটিতে ঢুকতে হবে**:
 ```javascript
 use myDatabase
@@ -134,7 +134,7 @@ db.dropDatabase()
 
 ---
 
-## **Step 11: MongoDB Restart, Stop ও Reload করা**
+## **Step 9: MongoDB Restart, Stop ও Reload করা**
 ```bash
 # MongoDB Restart
 sudo systemctl restart mongod
@@ -161,7 +161,7 @@ db.myCollection.find()
 
 ---
 
-## **Step 6: নির্দিষ্ট IP বা সকল IP থেকে Access দেওয়া (Firewall + Bind IP)**
+## **Step 10: নির্দিষ্ট IP বা সকল IP থেকে Access দেওয়া (Firewall + Bind IP)**
 MongoDB ডিফল্টভাবে শুধু লোকালহোস্ট (`127.0.0.1`) থেকে কানেক্ট হতে পারে। VPS-এর বাইরের কোনো সার্ভার থেকে অ্যাক্সেস দিতে হলে **bindIP পরিবর্তন ও firewall কনফিগার করতে হবে**।
 
 ### **1. MongoDB Config পরিবর্তন করা (Bind IP সেট করা)**
@@ -202,7 +202,7 @@ sudo ufw allow 27017/tcp
 
 ---
 
-## **Step 7: Firewall Enable ও Status চেক করা**
+## **Step 11: Firewall Enable ও Status চেক করা**
 ```bash
 sudo ufw enable
 sudo ufw status
