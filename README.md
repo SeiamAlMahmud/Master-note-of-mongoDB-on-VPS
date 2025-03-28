@@ -24,7 +24,14 @@ echo "deb [signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg] https://repo.mo
 ```bash
 sudo apt update
 ```
-
+### **যদি তুমি oracular (Ubuntu 24.04 LTS) ব্যবহার করে থাকো তাহলে এটি এখনো অফিসিয়ালভাবে MongoDB 7.0 সমর্থন করছে না, তুমি আগের Ubuntu 22.04 (jammy) কোডনেম ব্যবহার করতে পারো:**
+```bash
+echo "deb [signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+```
+#### **System Update করুন**
+```bash
+sudo apt update
+```
 ### **4. MongoDB Install করুন**
 ```bash
 sudo apt install -y mongodb-org
