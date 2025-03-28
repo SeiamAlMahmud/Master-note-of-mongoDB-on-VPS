@@ -375,3 +375,150 @@ mongorestore --db your_database_name /home/your_user/mongodb_backups/backup_fold
 ## **NOTE**  
 এখন আপনার **MongoDB automatic backup system** **সফলভাবে সেটআপ** করা হয়ে গেছে! প্রতিদিন **সকাল ৮টা ও রাত ৮টা**-তে VPS **অটোমেটিক MongoDB ব্যাকআপ** নিয়ে সংরক্ষণ করবে এবং পুরনো **৭ দিনের ব্যাকআপ মুছে ফেলবে।**  ⤵
 
+<br />
+<br />
+<br />
+<br />
+<br />
+
+## **Google Drive-এ MongoDB Backup অটোমেটিক আপলোড**  
+আপনার VPS-এ MongoDB ব্যাকআপ গুগল ড্রাইভে **অটোমেটিক** আপলোড করতে **rclone** ব্যবহার করা হবে।  
+
+---
+
+### **Step 1: VPS-এ rclone ইন্সটল করুন**  
+VPS-এর টার্মিনালে নিচের কমান্ড দিন:  
+```bash
+curl https://rclone.org/install.sh | sudo bash
+```
+এটি **rclone** ইন্সটল করবে।  
+
+---
+
+### **Step 2: rclone কনফিগার করুন (Google Drive একাউন্ট যুক্ত করুন)**  
+```bash
+rclone config
+```
+এরপর ধাপে ধাপে অনুসরণ করুন:  
+
+1. নতুন কনফিগার তৈরি করুন:  
+   - `n` চাপুন (New remote)  
+   - নাম দিন: `gdrive`  
+
+2. Google Drive নির্বাচন করুন:  
+   - `Storage type` চাবে, সেখানে `drive` টাইপ করুন  
+
+3. **Client ID & Secret এন্টার করা লাগবে না**, শুধু **Enter** চাপুন  
+
+4. **Authentication Method**:  
+   - **Full access দিতে** `1` চাপুন  
+
+5. **Google Drive Authorization:**  
+   - VPS-এর **ব্রাউজার না থাকলে**, আপনাকে একটা **লিংক দেবে**  
+   - **লিংক ওপেন করে** আপনার **Google Account** দিয়ে লগইন করুন  
+   - **Authentication কোড কপি করে** VPS-এর টার্মিনালে পেস্ট করুন  
+
+6. সেটিংস সেভ করুন:  
+   - `y` চাপুন (Yes)  
+
+---
+
+### **Step 3: ব্যাকআপ স্ক্রিপ্টে Google Drive আপলোড যুক্ত করুন**  
+`backup.sh` ফাইল খুলুন:  
+```bash
+nano ~/backup.sh
+```
+নিচের লাইনটি স্ক্রিপ্টের **শেষে** যুক্ত করুন:  
+```bash
+rclone copy "$BACKUP_DIR" gdrive:MongoDB_Backups
+```
+এটি আপনার ব্যাকআপ ফাইল **Google Drive-এর "MongoDB_Backups" ফোল্ডারে** আপলোড করবে।  
+
+---
+
+### **Step 4: ম্যানুয়ালি আপলোড পরীক্ষা করুন**  
+```bash
+./backup.sh
+```
+তারপর Google Drive-এ **MongoDB_Backups** ফোল্ডারে গিয়ে দেখুন ফাইল এসেছে কিনা।  
+
+---
+
+### **Step 5: Cron Job আপডেট করুন (Auto Upload)**  
+```bash
+crontab -e
+```
+নিচের লাইনটি যোগ করুন:  
+```bash
+0 8 * * * /home/your_user/backup.sh >> /home/your_user/backup.log 2>&1
+0 20 * * * /home/your_user/backup.sh >> /home/your_user/backup.log 2>&1
+```
+এতে **প্রতিদিন ২ বার** ব্যাকআপ নিয়ে **Google Drive-এ আপলোড** হবে।  
+
+---
+
+## **AWS S3-তে MongoDB Backup আপলোড করা**  
+AWS S3-তে MongoDB ব্যাকআপ আপলোড করার জন্য **AWS CLI** ব্যবহার করবো।  
+
+---
+
+### **Step 1: AWS CLI ইন্সটল করুন**  
+VPS-এর টার্মিনালে রান করুন:  
+```bash
+sudo apt update && sudo apt install awscli -y
+```
+
+---
+
+### **Step 2: AWS Credentials সেটআপ করুন**  
+```bash
+aws configure
+```
+এখন **AWS Access Key & Secret Key দিন** (আপনার AWS IAM Console থেকে নিতে হবে)।  
+- Access Key: `your_aws_access_key`  
+- Secret Key: `your_aws_secret_key`  
+- Region: `ap-southeast-1` (বাংলাদেশের জন্য Singapore)  
+- Output Format: `json`  
+
+---
+
+### **Step 3: S3-তে ব্যাকআপ আপলোড যুক্ত করুন**  
+`backup.sh` স্ক্রিপ্ট আপডেট করুন:  
+```bash
+nano ~/backup.sh
+```
+নিচের লাইনটি স্ক্রিপ্টের **শেষে** যুক্ত করুন:  
+```bash
+aws s3 cp --recursive "$BACKUP_DIR" s3://your-bucket-name/mongodb_backups/
+```
+⚠️ **your-bucket-name** পরিবর্তন করে **আপনার S3 bucket name দিন**।  
+
+---
+
+### **Step 4: ম্যানুয়ালি আপলোড পরীক্ষা করুন**  
+```bash
+./backup.sh
+```
+তারপর **AWS S3 console**-এ গিয়ে চেক করুন, ব্যাকআপ ফাইল আপলোড হয়েছে কিনা।  
+
+---
+
+### **Step 5: Cron Job আপডেট করুন (Auto Upload to S3)**  
+```bash
+crontab -e
+```
+নিচের লাইনটি যোগ করুন:  
+```bash
+0 8 * * * /home/your_user/backup.sh >> /home/your_user/backup.log 2>&1
+0 20 * * * /home/your_user/backup.sh >> /home/your_user/backup.log 2>&1
+```
+এতে **প্রতিদিন ২ বার** ব্যাকআপ নিয়ে **AWS S3-তে আপলোড** হবে।  
+
+---
+
+## **Final Result:**  
+✅ MongoDB-এর ব্যাকআপ **VPS-এ সংরক্ষণ** হবে  
+✅ **Google Drive / AWS S3**-তে **Auto Upload** হবে  
+✅ পুরনো **৭ দিনের ব্যাকআপ অটোমেটিক ডিলিট** হবে  
+
+---
