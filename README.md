@@ -381,7 +381,7 @@ mongorestore --db your_database_name /home/your_user/mongodb_backups/backup_fold
 <br />
 <br />
 
-## **Google Drive-এ MongoDB Backup অটোমেটিক আপলোড**  
+# **Google Drive-এ MongoDB Backup অটোমেটিক আপলোড**  
 আপনার VPS-এ MongoDB ব্যাকআপ গুগল ড্রাইভে **অটোমেটিক** আপলোড করতে **rclone** ব্যবহার করা হবে।  
 
 ---
@@ -461,7 +461,7 @@ crontab -e
 <br />
 <br />
 
-## **AWS S3-তে MongoDB Backup আপলোড করা**  
+# **AWS S3-তে MongoDB Backup আপলোড করা**  
 AWS S3-তে MongoDB ব্যাকআপ আপলোড করার জন্য **AWS CLI** ব্যবহার করবো।  
 
 ---
